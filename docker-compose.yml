@@ -1,0 +1,19 @@
+services:
+  victim:
+    image: nginx
+    container_name: victim
+    networks:
+      - labnet
+
+  attacker:
+    image: ubuntu
+    container_name: attacker
+    tty: true
+    stdin_open: true
+    command: sleep infinity
+    networks:
+      - labnet
+
+networks:
+  labnet:
+    driver: bridge
