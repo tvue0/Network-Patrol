@@ -33,7 +33,7 @@ def read_zeek_log(path):
 
 
 def main():
-    path = sys.argv[1] if len(sys.argv) > 1 else "conn.log"
+    path = sys.argv[1] if len(sys.argv) > 1 else "zeek/logs/conn.log"
     fields, rows = read_zeek_log(path)
 
     print(f"Parsed {path}: {len(rows)} record(s), {len(fields)} fields\n")
