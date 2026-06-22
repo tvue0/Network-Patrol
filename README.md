@@ -86,7 +86,7 @@ docker run --rm \
 -v $(pwd)/zeek/captures:/captures \
 -v $(pwd)/zeek/logs:/logs \
 zeek/zeek \
-zeek -C -r /captures/sample.pcap
+zeek -C -r /captures/<your-file>.pcap # replace with your PCAP filename
 ```
 
 ### Windows PowerShell
@@ -96,7 +96,7 @@ docker run --rm `
 -v "${PWD}\zeek\captures:/captures" `
 -v "${PWD}\zeek\logs:/logs" `
 zeek/zeek `
-zeek -C -r /captures/sample.pcap
+zeek -C -r /captures/<your-file>.pcap # replace with your PCAP filename
 ```
 
 ### Command Explanation
