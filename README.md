@@ -2,7 +2,10 @@
  Su26 ICS 460-50 Networks and Security Term Project
 
 
-# Zeek Setup and Usage
+# Zeek Setup and Usage (Docker-Based)
+## Overview
+
+This project uses the official Zeek Docker image rather than a traditional operating system installation of Zeek. Docker provides an isolated environment containing Zeek and its dependencies, allowing the same commands and workflow to be used across Windows, Linux, and VirtualBox environments.
 
 ## Requirements
 
@@ -40,19 +43,33 @@ Hello from Docker!
 
 ---
 
-## Pull the Zeek Docker Image
+## Install Zeek (Docker Image)
 
-Download the Zeek image:
+Download the official Zeek Docker image:
 
 ```bash
 docker pull zeek/zeek
 ```
 
-Verify the image is installed:
+Verify the image was downloaded:
 
 ```bash
 docker images
 ```
+
+Example output:
+
+```text
+REPOSITORY   TAG       IMAGE ID
+zeek/zeek    latest    xxxxxxxxxxxx
+```
+
+Verify Zeek is available inside the container:
+
+```bash
+docker run --rm zeek/zeek zeek --version
+```
+
 
 ---
 
