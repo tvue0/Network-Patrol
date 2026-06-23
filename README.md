@@ -191,3 +191,19 @@ Useful for:
 
 ---
 
+## References
+
+1. Zeek Project. *Quick Start Guide*.
+   https://docs.zeek.org/en/stable/quickstart/
+
+2. Zeek Project. *Invoking Zeek*.
+   https://docs.zeek.org/en/master/tutorial/invoking-zeek.html
+
+3. Zeek Project. *Zeek Documentation*.
+   https://docs.zeek.org/en/current/
+
+4. Zeek Project. *Get Zeek*.
+   https://zeek.org/get-zeek/
+
+5. Zeek Project. *Zeek Tutorial*.
+   https://docs.zeek.org/en/current/tutorial/
