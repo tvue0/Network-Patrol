@@ -9,7 +9,7 @@ and initial packet capture analysis demonstrates the system’s ability to gener
 The project architecture and evaluation approach have been defined, and future work will focus on attack simulation and automated log analysis.
 
 
-### Ermias Kassa – Docker Setup Progress
+### Ermias Kassa – Network patrol progress
 
 For my part of the project, I worked on setting up the Docker lab environment. I created an attacker container and a victim container and connected them through the same Docker network. I tested the setup using `ping`, `curl`, and `nmap` to make sure the containers could communicate and generate traffic.
 
