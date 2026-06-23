@@ -1,3 +1,10 @@
+## Network-Patrol
+Su26 ICS 460-50 Networks and Security Term Project
+
+
+
+
+
 ## Docker Lab Setup
 
 ### Overview
@@ -115,7 +122,38 @@ nmap victim
 ```
 
 These commands produce ICMP, HTTP, and TCP scan traffic suitable for PCAP generation and analysis.
-```
+---
+---
+# Zeek Setup and Usage (Docker-Based)
+## Overview
+
+This project uses the official Zeek Docker image rather than a traditional operating system installation of Zeek. Docker provides an isolated environment containing Zeek and its dependencies, allowing the same commands and workflow to be used across Windows, Linux, and VirtualBox environments.
+
+## Requirements
+
+- Docker
+- Git
+- A packet capture file (`.pcap`)
+
+---
+
+## Verify Docker Installation
+
+### Windows (Docker Desktop)
+
+Open and use either:
+
+- PowerShell
+- Windows Terminal
+- Command Prompt (cmd)
+
+### Linux / VirtualBox VM
+
+Open a terminal inside the VM.
+
+Run:
+
+```bash
 docker run hello-world
 ```
 
