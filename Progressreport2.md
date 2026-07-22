@@ -2,7 +2,7 @@
 
 **Course:** ICS 460-50 Networks and Security  
 **Project:** Network Patrol  
-**Team Members:**  
+**Group Members:**
 - Ermias Kassa
 - Abdullahi Mohamed
 
@@ -10,11 +10,11 @@
 
 # Project Status
 
-The project is approximately **95% complete**. Since Progress Report 1, we have completed the Docker network environment, generated network traffic, captured packet data, analyzed traffic using Zeek, and developed a Python security reporting tool. The remaining work consists of improving documentation, preparing screenshots, and practicing the final project presentation.
+The project is approximately **95% complete**. Since Progress Report 1, we have completed the major technical components of the project. The Docker lab environment is fully operational, network traffic can be generated and captured, Zeek successfully analyzes the traffic, and the Python program produces a security report summarizing the results. The remaining work consists of improving documentation, preparing screenshots, performing final testing, and practicing our presentation.
 
 ---
 
-# Ermias Kassa Contributions
+# Ermias Kassa work
 
 Since Progress Report 1, I completed the core infrastructure of the project by building a Docker-based network environment consisting of a custom Ubuntu attacker container and an Nginx victim web server connected through an isolated Docker network.
 
@@ -28,31 +28,20 @@ I integrated the official Zeek Docker image into the project and successfully pr
 - files.log
 - packet_filter.log
 
-I also updated the project documentation and verified the complete workflow from traffic generation through Zeek analysis.
+I also expanded the project documentation, updated the GitHub repository, and tested the complete workflow from Docker traffic generation through Zeek analysis and the Python reporting tool.
 
-Several technical challenges were encountered during development, including Docker networking, container configuration, GitHub authentication using Personal Access Tokens, packet capture, and Zeek configuration. These issues were resolved through testing and configuration changes until the environment became stable and repeatable.
+During the project I honestly thought both of my teammates had left, so I worked on a lot of the project by myself because I wanted to make sure I would still have a complete project to present.I focused on getting the Docker environment, packet capture, Zeek integration, testing, GitHub updates, and documentation working together as one complete system.
 
 ---
 
-# Abdullahi Mohamed Contributions
+# Abdullahi Mohamed – Python Analysis and Reporting 
 
-The Python analysis component was expanded into a security reporting tool capable of summarizing Zeek log data.
+For this report, I updated my earlier Python file so it does more than print the Zeek log. I tested it with the conn.log already in our repository. The test only had one HTTP connection, so the program labeled it normal. It also created a CSV file in the results folder. I still need a larger attack log from our Docker testing before I can properly test the suspicious-traffic rules. 
 
-The Python application now:
+ For the Final presentation
 
-- Parses Zeek connection logs
-- Counts observed network connections
-- Reports unique source hosts
-- Reports unique destination hosts
-- Identifies detected services
-- Displays the most active source hosts
-- Displays the most active destination hosts
-- Displays the most frequently targeted destination ports
-- Detects HTTP traffic
-- Detects DNS traffic
-- Identifies possible Nmap port scan activity based on the number of destination ports observed
+I will get separate normal-traffic and port-scan conn.log files from my teammate, run my Python detection program on both, compare the number of connections, unique ports, and failed connections, and adjust the detection thresholds if needed. After testing, I will record the TP, FP, TN, and FN results, create an Excel evaluation table and graph, update the GitHub README and results files, and help complete the final report and presentation.
 
-Testing with traffic generated inside the Docker lab confirmed that the analysis tool accurately summarizes network activity and highlights potentially suspicious behavior.
 
 ---
 
@@ -62,7 +51,7 @@ Testing with traffic generated inside the Docker lab confirmed that the analysis
 Docker Network
       │
       ▼
-Generate Traffic
+Generate Network Traffic
       │
       ▼
 Capture Packets (PCAP)
@@ -84,7 +73,7 @@ Python Security Report
 The project now includes:
 
 - Docker-based network environment
-- Custom attacker container
+- Custom Ubuntu attacker container
 - Nginx victim web server
 - Traffic generation using ping, curl, and Nmap
 - Packet capture using tcpdump
@@ -100,18 +89,18 @@ The project now includes:
 
 # Remaining Tasks
 
-The remaining work before the final presentation includes:
+Before the final presentation we plan to:
 
-- Final README revisions
-- Organize project screenshots
-- Create a network architecture diagram
-- Perform final testing
-- Prepare the live demonstration
+- Complete the final README.
+- Organize project screenshots.
+- Create a simple network architecture diagram.
+- Perform final testing.
+- Practice and prepare the live demonstration.
 
 ---
 
 # Overall Status
 
-The project objectives have been successfully completed. The Docker networking environment, traffic generation, packet capture, Zeek analysis, and Python reporting components are fully functional and integrated into a complete network monitoring workflow.
+Progress Report 1 was at 35% complete. Since then, we have completed the major implementation work and successfully integrated Docker networking, traffic generation, packet capture, Zeek analysis, and Python security reporting into one complete workflow.
 
-The project is now in its final documentation and presentation phase before submission.
+The project is at 95% complete and is in the final documentation and presentation phase before submission.
