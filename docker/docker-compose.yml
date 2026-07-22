@@ -1,19 +1,31 @@
 services:
   victim:
-    image: nginx
+    image: nginx:latest
     container_name: victim
     networks:
-      - labnet
+      labnet:
+        ipv4_address: 172.28.0.10
 
   attacker:
-    image: ubuntu
+    build:
+      context: .
+      dockerfile: docker/attacker.Dockerfile
     container_name: attacker
     tty: true
     stdin_open: true
     command: sleep infinity
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    volumes:
+      - ./zeek/captures:/captures
     networks:
-      - labnet
+      labnet:
+        ipv4_address: 172.28.0.20
 
 networks:
   labnet:
     driver: bridge
+    ipam:
+      config:
+        - subnet: 172.28.0.0/24
