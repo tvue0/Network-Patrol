@@ -1,279 +1,197 @@
-## Docker Lab Setup
+# Network Patrol
 
-### Overview
+ICS 460 - Networks and Security Term Project
 
-The Docker environment consists of two containers connected on the same network:
+## Project Overview
 
-- attacker (Ubuntu)
-- victim (Nginx web server)
+Network Patrol is a Docker-based Network Intrusion Detection System (NIDS) demonstration project.
 
-The purpose of this setup is to generate normal and attack traffic for later analysis.
+The project creates an isolated virtual network consisting of an attacker container and a victim web server. Network traffic is generated using common networking tools such as ping, curl, and Nmap. Traffic is captured into a PCAP file, analyzed with Zeek, and summarized using a custom Python analysis tool.
 
-### Start the Lab
+The project demonstrates an end-to-end intrusion detection workflow from traffic generation through security reporting.
 
-```bash
-docker compose up -d
+---
 
-### Verify Containers
-# Network-Patrol
- Su26 ICS 460-50 Networks and Security Term Project
+## Features
 
+- Docker-based virtual network
+- Custom Ubuntu attacker container
+- Nginx victim web server
+- Traffic generation using ping, curl, and Nmap
+- Packet capture using tcpdump
+- Zeek log generation
+- Python-based security report
+- HTTP and DNS traffic detection
+- Basic Nmap port scan detection
+- Connection statistics and traffic summaries
 
-# Zeek Setup and Usage (Docker-Based)
-## Overview
+---
 
-This project uses the official Zeek Docker image rather than a traditional operating system installation of Zeek. Docker provides an isolated environment containing Zeek and its dependencies, allowing the same commands and workflow to be used across Windows, Linux, and VirtualBox environments.
+## Project Architecture
+
+```
+Attacker Container
+        |
+        |  Ping / Curl / Nmap
+        |
+        V
+Victim Container
+        |
+        V
+Packet Capture (PCAP)
+        |
+        V
+Zeek Analysis
+        |
+        V
+Zeek Log Files
+        |
+        V
+Python Security Report
+```
+
+---
+
+## Project Structure
+
+```
+Network-Patrol/
+│
+├── docker/
+│   └── attacker.Dockerfile
+│
+├── python/
+│   └── log_analysis.py
+│
+├── zeek/
+│   ├── captures/
+│   └── logs/
+│
+├── screenshots/
+│
+├── docker-compose.yml
+├── README.md
+└── ProgressReport2.md
+```
+
+---
 
 ## Requirements
 
 - Docker
-- Git
-- A packet capture file (`.pcap`)
+- Docker Compose
+- Python 3
+- Zeek Docker Image
 
 ---
 
-## Verify Docker Installation
-
-### Windows (Docker Desktop)
-
-Open and use either:
-
-- PowerShell
-- Windows Terminal
-- Command Prompt (cmd)
-
-### Linux / VirtualBox VM
-
-Open a terminal inside the VM.
-
-Run:
+## Starting the Lab
 
 ```bash
-docker ps
+docker compose up --build -d
 ```
 
-Expected output should show:
-
-- attacker
-- victim
-
-### Enter the Attacker Container
+Verify the containers:
 
 ```bash
-docker exec -it attacker bash
-```
-
-### Test Connectivity
-
-```bash
-ping -c 4 victim
-```
-
-Expected:
-- Replies from victim
-- 0% packet loss
-
-### Access Victim Web Server
-
-```bash
-curl http://victim
-```
-
-Expected:
-- Nginx welcome page HTML
-
-### Scan Victim
-
-```bash
-nmap victim
-```
-
-Expected:
-- Port 80/tcp open
-- Service: http
-
-### Exit Container
-
-```bash
-exit
-```
-
-### Stop the Lab
-
-```bash
-docker compose down
-```
-
-### Generate Traffic for Packet Capture
-
-The following commands generate network traffic that can be captured by tools such as tcpdump, Wireshark, or Zeek:
-
-```bash
-ping -c 4 victim
-curl http://victim
-nmap victim
-```
-
-These commands produce ICMP, HTTP, and TCP scan traffic suitable for PCAP generation and analysis.
-```
-docker run hello-world
-```
-
-Expected output:
-
-```text
-Hello from Docker!
+docker compose ps
 ```
 
 ---
 
-## Install Zeek (Docker Image)
+## Generate Network Traffic
 
-Download the official Zeek Docker image:
-
-```bash
-docker pull zeek/zeek
-```
-
-Verify the image was downloaded:
+Generate ICMP traffic:
 
 ```bash
-docker images
+docker exec attacker ping -c 5 victim
 ```
 
-Example output:
-
-```text
-REPOSITORY   TAG       IMAGE ID
-zeek/zeek    latest    xxxxxxxxxxxx
-```
-
-Verify Zeek is available inside the container:
+Generate HTTP traffic:
 
 ```bash
-docker run --rm zeek/zeek zeek --version
+docker exec attacker curl http://victim
 ```
 
+Generate an Nmap scan:
 
----
-
-## Project Directory Structure
-
-```text
-Network-Patrol/
-├── docs/
-├── docker/
-├── python/
-├── zeek/
-│   ├── captures/
-│   └── logs/
-└── README.md
-```
-
-Place PCAP files inside:
-
-```text
-zeek/captures/
+```bash
+docker exec attacker nmap -sS -sV victim
 ```
 
 ---
 
-## Run Zeek Against a PCAP
+## Capture Network Traffic
 
-### Linux / VirtualBox
+Start packet capture:
+
+```bash
+docker exec -d attacker tcpdump -i eth0 -w /captures/network-patrol-demo.pcap
+```
+
+Generate traffic.
+
+Stop packet capture:
+
+```bash
+docker exec attacker pkill tcpdump
+```
+
+---
+
+## Run Zeek
 
 ```bash
 docker run --rm \
--v $(pwd)/zeek/captures:/captures \
--v $(pwd)/zeek/logs:/logs \
+-v "$(pwd)/zeek/captures:/captures" \
+-v "$(pwd)/zeek/logs:/logs" \
+-w /logs \
 zeek/zeek \
-zeek -C -r /captures/<your-file>.pcap # replace with your PCAP filename
-```
-
-### Windows PowerShell
-
-```powershell
-docker run --rm `
--v "${PWD}\zeek\captures:/captures" `
--v "${PWD}\zeek\logs:/logs" `
-zeek/zeek `
-zeek -C -r /captures/<your-file>.pcap # replace with your PCAP filename
-```
-
-### Command Explanation
-
-| Option | Purpose |
-|----------|----------|
-| `--rm` | Removes container after execution |
-| `-v` | Mounts local folders into the container |
-| `-C` | Ignores checksum issues common in sample captures |
-| `-r` | Reads a PCAP file |
-
----
-
-## Verify Log Generation
-
-After Zeek completes, the following logs should appear in:
-
-```text
-zeek/logs/
-```
-
-Typical outputs:
-
-```text
-conn.log
-http.log
-files.log
-packet_filter.log
+zeek -C -r /captures/network-patrol-demo.pcap
 ```
 
 ---
 
-## Log Overview
+## Generate the Security Report
 
-### conn.log
+```bash
+python3 python/log_analysis.py
+```
 
-Contains:
+Example report:
 
-- Source IP
-- Destination IP
-- Ports
-- Protocol
-- Connection duration
+```
+Connections Observed: 1014
 
-Useful for:
+Unique Source Hosts: 4
 
-- Port scan detection
-- Unusual connection analysis
+Unique Destination Hosts: 4
 
----
+Services Detected
+- HTTP
+- DNS
 
-### http.log
-
-Contains:
-
-- HTTP requests
-- URLs
-- Request methods
-
-Useful for:
-
-- Web traffic analysis
+Possible Nmap Port Scan Detected
+```
 
 ---
 
-### files.log
+## Technologies Used
 
-Contains:
-
-- File transfer metadata
-
-Useful for:
-
-- Monitoring transferred files
+- Docker
+- Docker Compose
+- Ubuntu
+- Nginx
+- tcpdump
+- Zeek
+- Python 3
 
 ---
+
+## Team Members
+
+- Ermias Kassa
+- Abdullahi Mohamed
 
 ## References
 
