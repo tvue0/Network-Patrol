@@ -1,0 +1,5 @@
+source_ip,connections,unique_destination_ips,unique_destination_ports,failed_connections,status,reason
+172.28.0.20,1010,1,1001,1001,SUSPICIOUS,Contacted many destination ports; Created many connections; Had many failed connections
+172.28.0.1,1,1,1,1,NORMAL,No detection rule was triggered
+fe80::1062:3dff:fee5:5f39,2,2,2,1,NORMAL,No detection rule was triggered
+fe80::e0d1:caff:fe18:dc99,1,1,1,1,NORMAL,No detection rule was triggered

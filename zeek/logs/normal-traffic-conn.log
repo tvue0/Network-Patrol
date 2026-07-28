@@ -1,0 +1,17 @@
+#separator \x09
+#set_separator	,
+#empty_field	(empty)
+#unset_field	-
+#path	conn
+#open	2026-07-28-22-10-41
+#fields	ts	uid	id.orig_h	id.orig_p	id.resp_h	id.resp_p	proto	service	duration	orig_bytes	resp_bytes	conn_state	local_orig	local_resp	missed_bytes	history	orig_pkts	orig_ip_bytes	resp_pkts	resp_ip_bytes	tunnel_parents	ip_proto
+#types	time	string	addr	port	addr	port	enum	string	interval	count	count	string	bool	bool	count	string	count	count	count	count	set[string]	count
+1785276530.875296	C6VUia2fBw0vICnGdf	172.28.0.20	38700	172.28.0.10	80	tcp	http	0.000710	70	1134	SF	T	T	0	ShADadFf	7	442	5	1402	-	6
+1785276528.068438	CO662024iGulsJVo3k	172.28.0.1	5353	224.0.0.251	5353	udp	dns	-	-	-	S0	T	T	0	D	1	73	0	0	-	17
+1785276529.419596	ClI25h1AtG1KFzTRkk	fe80::9800:d7ff:fe06:2feb	5353	ff02::fb	5353	udp	dns	-	-	-	S0	T	F	0	D	1	93	0	0	-	17
+1785276530.310892	CKQQ7U1tBLsI3W3jGf	fe80::3cd5:6eff:fe72:25d	5353	ff02::fb	5353	udp	dns	-	-	-	S0	T	F	0	D	1	93	0	0	-	17
+1785276535.833607	CnCi2kQ007O6bMqsf	172.28.0.20	38716	172.28.0.10	80	tcp	http	0.000629	70	1134	SF	T	T	0	ShADadFf	7	442	5	1402	-	6
+1785276539.442252	ClzSm33ecc7z2DXsYh	172.28.0.20	44774	172.28.0.10	80	tcp	http	0.000648	70	1134	SF	T	T	0	ShADadFf	7	442	5	1402	-	6
+1785276530.564319	Cq9REt2TwwqB0GsFF8	fe80::9800:d7ff:fe06:2feb	133	ff02::2	134	icmp	-	-	-	-	OTH	T	F	0	-	1	56	0	0	-	58
+1785276516.907379	Cvfn8axLwcyEObwyk	172.28.0.20	8	172.28.0.10	0	icmp	-	4.120950	280	280	OTH	T	T	0	-	5	420	5	420	-	1
+#close	2026-07-28-22-10-41

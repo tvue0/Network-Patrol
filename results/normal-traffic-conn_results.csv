@@ -1,0 +1,5 @@
+source_ip,connections,unique_destination_ips,unique_destination_ports,failed_connections,status,reason
+172.28.0.20,4,1,2,0,NORMAL,No detection rule was triggered
+172.28.0.1,1,1,1,1,NORMAL,No detection rule was triggered
+fe80::9800:d7ff:fe06:2feb,2,2,2,1,NORMAL,No detection rule was triggered
+fe80::3cd5:6eff:fe72:25d,1,1,1,1,NORMAL,No detection rule was triggered
