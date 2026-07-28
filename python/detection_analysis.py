@@ -3,6 +3,13 @@ import os
 import sys
 
 
+PORT_THRESHOLD = 10
+CONNECTION_THRESHOLD = 20
+FAILED_CONNECTION_THRESHOLD = 10
+
+FAILED_STATES = ["S0", "REJ", "RSTO", "RSTRH", "SH", "SHR"]
+
+
 def read_zeek_log(file_path):
     records = []
     fields = []
@@ -31,8 +38,6 @@ def read_zeek_log(file_path):
 def analyze_connections(records):
     source_data = {}
 
-    failed_states = ["S0", "REJ", "RSTO", "RSTRH", "SH", "SHR"]
-
     for record in records:
         source_ip = record.get("id.orig_h", "unknown")
         destination_ip = record.get("id.resp_h", "unknown")
@@ -44,14 +49,14 @@ def analyze_connections(records):
                 "connections": 0,
                 "destination_ips": set(),
                 "destination_ports": set(),
-                "failed_connections": 0
+                "failed_connections": 0,
             }
 
         source_data[source_ip]["connections"] += 1
         source_data[source_ip]["destination_ips"].add(destination_ip)
         source_data[source_ip]["destination_ports"].add(destination_port)
 
-        if connection_state in failed_states:
+        if connection_state in FAILED_STATES:
             source_data[source_ip]["failed_connections"] += 1
 
     results = []
@@ -64,13 +69,13 @@ def analyze_connections(records):
 
         reasons = []
 
-        if unique_ports >= 10:
+        if unique_ports >= PORT_THRESHOLD:
             reasons.append("Contacted many destination ports")
 
-        if connections >= 20:
+        if connections >= CONNECTION_THRESHOLD:
             reasons.append("Created many connections")
 
-        if failed_connections >= 10:
+        if failed_connections >= FAILED_CONNECTION_THRESHOLD:
             reasons.append("Had many failed connections")
 
         if reasons:
@@ -80,23 +85,26 @@ def analyze_connections(records):
             status = "NORMAL"
             reason = "No detection rule was triggered"
 
-        results.append({
-            "source_ip": source_ip,
-            "connections": connections,
-            "unique_destination_ips": unique_ips,
-            "unique_destination_ports": unique_ports,
-            "failed_connections": failed_connections,
-            "status": status,
-            "reason": reason
-        })
+        results.append(
+            {
+                "source_ip": source_ip,
+                "connections": connections,
+                "unique_destination_ips": unique_ips,
+                "unique_destination_ports": unique_ports,
+                "failed_connections": failed_connections,
+                "status": status,
+                "reason": reason,
+            }
+        )
 
     return results
 
 
-def save_results(results):
+def save_results(results, log_path):
     os.makedirs("results", exist_ok=True)
 
-    output_file = os.path.join("results", "connection_analysis.csv")
+    log_name = os.path.splitext(os.path.basename(log_path))[0]
+    output_file = os.path.join("results", f"{log_name}_results.csv")
 
     columns = [
         "source_ip",
@@ -105,7 +113,7 @@ def save_results(results):
         "unique_destination_ports",
         "failed_connections",
         "status",
-        "reason"
+        "reason",
     ]
 
     with open(output_file, "w", newline="", encoding="utf-8") as csv_file:
@@ -124,13 +132,18 @@ def main():
     log_path = sys.argv[1]
 
     if not os.path.exists(log_path):
-        print("Error: conn.log was not found.")
+        print("Error: Zeek conn.log was not found.")
         print("Path entered:", log_path)
         return
 
     records = read_zeek_log(log_path)
+
+    if not records:
+        print("No traffic records were found in:", log_path)
+        return
+
     results = analyze_connections(records)
-    output_file = save_results(results)
+    output_file = save_results(results, log_path)
 
     suspicious_count = 0
 
@@ -139,6 +152,12 @@ def main():
     print("Log file:", log_path)
     print("Total Zeek records:", len(records))
     print("Unique source IPs:", len(results))
+
+    print("\nDetection Rules")
+    print("-" * 45)
+    print("Unique ports threshold:", PORT_THRESHOLD)
+    print("Connections threshold:", CONNECTION_THRESHOLD)
+    print("Failed connections threshold:", FAILED_CONNECTION_THRESHOLD)
 
     print("\nSource Summary")
     print("-" * 45)
@@ -153,7 +172,7 @@ def main():
             "ports,",
             result["failed_connections"],
             "failed,",
-            result["status"]
+            result["status"],
         )
 
         print("Reason:", result["reason"])
