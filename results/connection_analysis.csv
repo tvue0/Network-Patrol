@@ -1,2 +1,0 @@
-source_ip,connections,unique_destination_ips,unique_destination_ports,failed_connections,status,reason
-127.0.0.1,1,1,1,0,NORMAL,No detection rule was triggered

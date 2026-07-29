@@ -4,11 +4,11 @@ ICS 460 - Networks and Security Term Project
 
 ## Project Overview
 
-Network Patrol is a Docker-based Network Intrusion Detection System (NIDS) demonstration project.
+Network Patrol is a Docker-based Network Intrusion Detection System demonstration project.
 
-The project creates an isolated virtual network consisting of an attacker container and a victim web server. Network traffic is generated using common networking tools such as ping, curl, and Nmap. Traffic is captured into a PCAP file, analyzed with Zeek, and summarized using a custom Python analysis tool.
+The project creates an isolated virtual network consisting of an attacker container and a victim web server. Network traffic is generated using tools such as ping, curl, and Nmap. The traffic is captured into a PCAP file, analyzed with Zeek, and then processed by a custom Python detector.
 
-The project demonstrates an end-to-end intrusion detection workflow from traffic generation through security reporting.
+The project demonstrates an end-to-end intrusion detection workflow from traffic generation to detection results.
 
 ---
 
@@ -20,19 +20,20 @@ The project demonstrates an end-to-end intrusion detection workflow from traffic
 - Traffic generation using ping, curl, and Nmap
 - Packet capture using tcpdump
 - Zeek log generation
-- Python-based security report
-- HTTP and DNS traffic detection
-- Basic Nmap port scan detection
-- Connection statistics and traffic summaries
+- Python-based connection analysis
+- Nmap port-scan detection
+- Normal and suspicious traffic classification
+- CSV result files
+- Testing comparison graph
 
 ---
 
 ## Project Architecture
 
-```
+```text
 Attacker Container
         |
-        |  Ping / Curl / Nmap
+        | Ping / Curl / Nmap
         |
         V
 Victim Container
@@ -44,30 +45,47 @@ Packet Capture (PCAP)
 Zeek Analysis
         |
         V
-Zeek Log Files
+Zeek conn.log
         |
         V
-Python Security Report
+Python Detection Program
+        |
+        V
+CSV Results and Comparison Graph
 ```
 
 ---
 
 ## Project Structure
 
-```
+```text
 Network-Patrol/
 │
 ├── docker/
 │   └── attacker.Dockerfile
 │
+├── docs/
+│   └── final_results.md
+│
 ├── python/
+│   ├── detection_analysis.py
 │   └── log_analysis.py
+│
+├── results/
+│   ├── normal-traffic-conn_results.csv
+│   ├── attack_conn_results.csv
+│   └── network_patrol_comparison_graph.png
+│
+├── screenshots/
+│   ├── normal_traffic_detection_result.png
+│   └── attack_detection_result.png
 │
 ├── zeek/
 │   ├── captures/
+│   │   └── network-patrol-demo.pcap
 │   └── logs/
-│
-├── screenshots/
+│       ├── normal-traffic-conn.log
+│       └── attack_conn.log
 │
 ├── docker-compose.yml
 ├── README.md
@@ -81,17 +99,19 @@ Network-Patrol/
 - Docker
 - Docker Compose
 - Python 3
-- Zeek Docker Image
+- Zeek Docker image
 
 ---
 
 ## Starting the Lab
 
+Start the Docker environment:
+
 ```bash
 docker compose up --build -d
 ```
 
-Verify the containers:
+Verify that the containers are running:
 
 ```bash
 docker compose ps
@@ -129,7 +149,7 @@ Start packet capture:
 docker exec -d attacker tcpdump -i eth0 -w /captures/network-patrol-demo.pcap
 ```
 
-Generate traffic.
+Generate the normal or attack traffic while tcpdump is running.
 
 Stop packet capture:
 
@@ -141,6 +161,8 @@ docker exec attacker pkill tcpdump
 
 ## Run Zeek
 
+Use Zeek to process the captured PCAP file:
+
 ```bash
 docker run --rm \
 -v "$(pwd)/zeek/captures:/captures" \
@@ -150,28 +172,114 @@ zeek/zeek \
 zeek -C -r /captures/network-patrol-demo.pcap
 ```
 
+Zeek creates connection logs that can be analyzed by the Python program.
+
 ---
 
-## Generate the Security Report
+## Run the Python Detector
+
+Run these commands from the main `Network-Patrol` folder.
+
+Normal traffic test:
 
 ```bash
-python3 python/log_analysis.py
+python python/detection_analysis.py zeek/logs/normal-traffic-conn.log
 ```
 
-Example report:
+Nmap attack test:
 
+```bash
+python python/detection_analysis.py zeek/logs/attack_conn.log
 ```
-Connections Observed: 1014
 
-Unique Source Hosts: 4
+On systems that use `python3`, replace `python` with `python3`.
 
-Unique Destination Hosts: 4
+---
 
-Services Detected
-- HTTP
-- DNS
+## Detection Rules
 
-Possible Nmap Port Scan Detected
+The Python program groups connection records by source IP and calculates:
+
+- Total connections
+- Unique destination IPs
+- Unique destination ports
+- Failed connections
+
+A source IP is labeled `SUSPICIOUS` when at least one of these rules is triggered:
+
+- 10 or more unique destination ports
+- 20 or more connections
+- 10 or more failed connections
+
+If no rule is triggered, the source is labeled `NORMAL`.
+
+---
+
+## Testing Results
+
+| Test | Connections | Unique Ports | Failed Connections | Result |
+|---|---:|---:|---:|---|
+| Normal Traffic | 4 | 2 | 0 | NORMAL |
+| Nmap Port Scan | 1,010 | 1,001 | 1,001 | SUSPICIOUS |
+
+### Normal Traffic Test
+
+The normal traffic file contained:
+
+- 8 Zeek records
+- 4 source IPs
+- 0 suspicious source IPs
+
+All source IPs were correctly labeled `NORMAL`.
+
+### Nmap Attack Test
+
+The attack file contained:
+
+- 1,014 Zeek records
+- 4 source IPs
+- 1 suspicious source IP
+
+The main attack source was `172.28.0.20`. It created 1,010 connections, contacted 1,001 destination ports, and had 1,001 failed connections.
+
+The source triggered all three detection rules and was correctly labeled `SUSPICIOUS`.
+
+---
+
+## Evaluation
+
+The project used one normal-traffic scenario and one simulated Nmap attack scenario.
+
+| Measurement | Result |
+|---|---:|
+| True Positives | 1 |
+| True Negatives | 1 |
+| False Positives | 0 |
+| False Negatives | 0 |
+
+The detector correctly identified the Nmap scan and did not generate a false alarm for the normal-traffic test.
+
+---
+
+## Output Files
+
+The Python detector creates separate CSV files for each test:
+
+```text
+results/normal-traffic-conn_results.csv
+results/attack_conn_results.csv
+```
+
+The comparison graph is saved as:
+
+```text
+results/network_patrol_comparison_graph.png
+```
+
+The detailed testing summary is located at:
+
+```text
+docs/final_results.md
 ```
 
 ---
@@ -182,6 +290,7 @@ Possible Nmap Port Scan Detected
 - Docker Compose
 - Ubuntu
 - Nginx
+- Nmap
 - tcpdump
 - Zeek
 - Python 3
@@ -192,20 +301,21 @@ Possible Nmap Port Scan Detected
 
 - Ermias Kassa
 - Abdullahi Mohamed
+---
 
 ## References
 
-1. Zeek Project. *Quick Start Guide*.
+1. Zeek Project. *Quick Start Guide*.  
    https://docs.zeek.org/en/stable/quickstart/
 
-2. Zeek Project. *Invoking Zeek*.
+2. Zeek Project. *Invoking Zeek*.  
    https://docs.zeek.org/en/master/tutorial/invoking-zeek.html
 
-3. Zeek Project. *Zeek Documentation*.
+3. Zeek Project. *Zeek Documentation*.  
    https://docs.zeek.org/en/current/
 
-4. Zeek Project. *Get Zeek*.
+4. Zeek Project. *Get Zeek*.  
    https://zeek.org/get-zeek/
 
-5. Zeek Project. *Zeek Tutorial*.
+5. Zeek Project. *Zeek Tutorial*.  
    https://docs.zeek.org/en/current/tutorial/
